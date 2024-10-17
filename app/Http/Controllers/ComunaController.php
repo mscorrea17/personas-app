@@ -10,7 +10,6 @@ class ComunaController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -25,31 +24,35 @@ class ComunaController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        return view('comuna.create');
+        $municipios = DB::table('tb_municipio')
+            ->orderBy('muni_nomb')
+            ->get();
+
+        return view('comuna.new', ['municipios' => $municipios]);
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        // Validar los datos entrantes
-        $request->validate([
-            'comu_nomb' => 'required|string|max:255', // Ajusta los nombres de los campos según tu base de datos
-            'muni_nomb' => 'required|string|max:255',
-        ]);
+        $comunas = new Comuna();
+        $comunas->comu_nomb = $request->name;
+        $comunas->muni_codi = $request->code;
+        $comunas->save();
 
-        // Crear una nueva comuna
-        Comuna::create([
-            'comu_nomb' => $request->comu_nomb,
-            'muni_nomb' => $request->muni_nomb,
-        ]);
+        $comunas = DB::table('tb_comuna')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_comuna.*', 'tb_municipio.muni_nomb')
+            ->get();
 
-        // Redirigir a la lista de comunas con un mensaje
-        return redirect()->route('comunas.index')->with('success', 'Comuna creada con éxito.');
+        return view('comuna.index', ['comunas' => $comunas]);
     }
 
     /**
@@ -57,52 +60,60 @@ class ComunaController extends Controller
      */
     public function show(string $id)
     {
-        // Implementar según sea necesario
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
+     * @param string $id
+     * @return \Illuminate\Http\Response
      */
     public function edit(string $id)
     {
-        $comuna = Comuna::findOrFail($id);
-        return view('comuna.edit', compact('comuna'));
+        $comuna = Comuna::find($id);
+        $municipios = DB::table('tb_municipio')
+            ->orderBy('muni_nomb')
+            ->get();
+
+        return view('comuna.edit', ['comuna' => $comuna, 'municipios' => $municipios]);
     }
 
     /**
      * Update the specified resource in storage.
+     * @param \Illuminate\Http\Request $request
+     * @param string $id
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, string $id)
     {
-        // Validar los datos entrantes
-        $request->validate([
-            'comu_nomb' => 'required|string|max:255',
-            'muni_nomb' => 'required|string|max:255',
-        ]);
+        $comuna = Comuna::find($id);
+        $comuna->comu_nomb = $request->name;
+        $comuna->muni_codi = $request->code;
+        $comuna->save();
 
-        // Buscar la comuna
-        $comuna = Comuna::findOrFail($id);
+        $comunas = DB::table('tb_comuna')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_comuna.*', 'tb_municipio.muni_nomb')
+            ->get();
 
-        // Actualizar la comuna
-        $comuna->update([
-            'comu_nomb' => $request->comu_nomb,
-            'muni_nomb' => $request->muni_nomb,
-        ]);
-
-        // Redirigir a la lista de comunas con un mensaje
-        return redirect()->route('comunas.index')->with('success', 'Comuna actualizada con éxito.');
+        return view('comuna.index', ['comunas' => $comunas]);
     }
 
     /**
      * Remove the specified resource from storage.
+     * @param string $id
+     * @return \Illuminate\Http\Response
      */
     public function destroy(string $id)
     {
-        // Buscar la comuna y eliminarla
-        $comuna = Comuna::findOrFail($id);
+        $comuna = Comuna::find($id);
         $comuna->delete();
 
-        // Redirigir a la lista de comunas con un mensaje
-        return redirect()->route('comunas.index')->with('success', 'Comuna eliminada con éxito.');
+        $comunas = DB::table('tb_comuna')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_comuna.*', 'tb_municipio.muni_nomb')
+            ->get();
+
+        return view('comuna.index', ['comunas' => $comunas]);
     }
 }
