@@ -56,17 +56,7 @@ class ComunaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
-     * @param string $id
-     * @return \Illuminate\Http\Response
      */
     public function edit(string $id)
     {
