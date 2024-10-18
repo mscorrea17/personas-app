@@ -12,3 +12,4 @@ class Municipio extends Model
     protected $primaryKey = 'muni_codi';
     public $timestamps = false;
 }
+//Solucionado

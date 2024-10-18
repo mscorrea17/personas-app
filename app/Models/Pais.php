@@ -12,3 +12,4 @@ class Pais extends Model
     protected $primaryKey = 'pais_codi';
     public $timestamps = false;
 }
+//Solucionado

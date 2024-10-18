@@ -12,3 +12,4 @@ class Departamento extends Model
     protected $primaryKey = 'depa_codi';
     public $timestamps = false;
 }
+//Solucionado
